@@ -1,178 +1,151 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { URL } = require('url');
+const http = require("http");
+const { URL } = require("url");
 
-const port = process.env.PORT || 4173;
-const rootDir = __dirname;
+// Environment variables
+const OWNER_EMAIL = process.env.OWNER_EMAIL || "owner@temorpay.com";
+const OWNER_PASSWORD = process.env.OWNER_PASSWORD || "temor123";
 
-const ownerEmail = (process.env.OWNER_EMAIL || 'owner@temorpay.com').toLowerCase();
-const ownerPassword = process.env.OWNER_PASSWORD || 'temor123';
-const activeTokens = new Set();
+const port = process.env.PORT || 3000;
 
-const invoices = [
-  { id: 'INV-1048', product: 'Pro Access', amountLtc: 0.34, detection: 'Automatic', status: 'Paid', updated: '2 min ago', orderId: 'ORD-8812' },
-  { id: 'INV-1047', product: 'Starter Access', amountLtc: 0.11, detection: 'Manual TXID', status: 'Reviewing', updated: '4 min ago', orderId: 'ORD-8811', txid: null },
-  { id: 'INV-1046', product: 'Enterprise', amountLtc: 1.22, detection: 'Automatic', status: 'Expired', updated: '10 min ago', orderId: 'ORD-8810' },
-];
+// In-memory storage (resets on deploy — fine for demo)
+let invoices = [];
+let invoiceCounter = 1;
 
-const deliveryQueue = [
-  { orderId: 'ORD-8812', email: 'buyer1@email.com', product: 'Pro Access', status: 'Sent', retries: 0 },
-  { orderId: 'ORD-8811', email: 'buyer2@email.com', product: 'Starter Access', status: 'Queued', retries: 0 },
-  { orderId: 'ORD-8810', email: 'buyer3@email.com', product: 'Enterprise', status: 'Failed', retries: 1 },
-];
+/*
+|--------------------------------------------------------------------------
+| Core Request Handler
+|--------------------------------------------------------------------------
+*/
 
-function json(res, status, payload) {
-  res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(payload));
-}
-
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    let data = '';
-    req.on('data', (chunk) => {
-      data += chunk;
-      if (data.length > 1e6) reject(new Error('Request body too large'));
-    });
-    req.on('end', () => {
-      if (!data) return resolve({});
-      try {
-        resolve(JSON.parse(data));
-      } catch {
-        resolve({});
-      }
-      return undefined;
-    });
-    req.on('error', reject);
-  });
-}
-
-function getToken(req) {
-  const header = req.headers.authorization || '';
-  return header.startsWith('Bearer ') ? header.slice(7) : '';
-}
-
-function requireAuth(req, res) {
-  const token = getToken(req);
-  if (!token || !activeTokens.has(token)) {
-    json(res, 401, { error: 'Unauthorized' });
-    return false;
-  }
-  return true;
-}
-
-function serveStatic(req, res, pathname) {
-  const cleanPath = pathname === '/' ? '/index.html' : pathname;
-  const filePath = path.join(rootDir, path.normalize(cleanPath));
-  if (!filePath.startsWith(rootDir)) {
-    json(res, 403, { error: 'Forbidden' });
-    return;
-  }
-
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      json(res, 404, { error: 'Not found' });
-      return;
-    }
-
-    const ext = path.extname(filePath);
-    const mime = {
-      '.html': 'text/html',
-      '.css': 'text/css',
-      '.js': 'application/javascript',
-      '.json': 'application/json',
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.svg': 'image/svg+xml',
-    }[ext] || 'text/plain';
-
-    res.writeHead(200, { 'Content-Type': mime });
-    res.end(content);
-  });
-}
-
-const server = http.createServer(async (req, res) => {
+async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const { pathname } = url;
 
-  if (req.method === 'POST' && pathname === '/api/auth/login') {
-    const body = await readBody(req);
-    const email = (body.email || '').toLowerCase();
+  // Enable CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    if (email !== ownerEmail || body.password !== ownerPassword) {
-      return json(res, 401, { error: 'Invalid credentials' });
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  // Parse body if needed
+  const getBody = () =>
+    new Promise((resolve) => {
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", () => {
+        try {
+          resolve(body ? JSON.parse(body) : {});
+        } catch {
+          resolve({});
+        }
+      });
+    });
+
+  /*
+  |--------------------------------------------------------------------------
+  | ROUTES
+  |--------------------------------------------------------------------------
+  */
+
+  // Health check
+  if (pathname === "/api/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok" }));
+    return;
+  }
+
+  // Login
+  if (pathname === "/api/login" && req.method === "POST") {
+    const body = await getBody();
+
+    if (
+      body.email === OWNER_EMAIL &&
+      body.password === OWNER_PASSWORD
+    ) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true }));
+    } else {
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false }));
+    }
+    return;
+  }
+
+  // Create invoice
+  if (pathname === "/api/invoices" && req.method === "POST") {
+    const body = await getBody();
+
+    const invoice = {
+      id: invoiceCounter++,
+      amount: body.amount,
+      description: body.description || "",
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+
+    invoices.push(invoice);
+
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(invoice));
+    return;
+  }
+
+  // Get all invoices
+  if (pathname === "/api/invoices" && req.method === "GET") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(invoices));
+    return;
+  }
+
+  // Confirm invoice
+  if (
+    pathname.startsWith("/api/invoices/") &&
+    pathname.endsWith("/confirm") &&
+    req.method === "POST"
+  ) {
+    const id = parseInt(pathname.split("/")[3]);
+    const invoice = invoices.find((i) => i.id === id);
+
+    if (!invoice) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Invoice not found" }));
+      return;
     }
 
-    const token = crypto.randomBytes(24).toString('hex');
-    activeTokens.add(token);
-    return json(res, 200, { token, owner: { email: ownerEmail } });
+    invoice.status = "confirmed";
+
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(invoice));
+    return;
   }
 
-  if (req.method === 'GET' && pathname === '/api/delivery/queue') {
-    if (!requireAuth(req, res)) return;
-    return json(res, 200, { items: deliveryQueue });
-  }
+  // Not found
+  res.writeHead(404, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({ error: "Not found" }));
+}
 
-  if (req.method === 'POST' && pathname.startsWith('/api/delivery/retry/')) {
-    if (!requireAuth(req, res)) return;
-    const orderId = pathname.split('/').pop();
-    const item = deliveryQueue.find((entry) => entry.orderId === orderId);
-    if (!item) return json(res, 404, { error: 'Order not found in queue' });
+/*
+|--------------------------------------------------------------------------
+| Vercel Export
+|--------------------------------------------------------------------------
+*/
 
-    item.retries += 1;
-    item.status = 'Queued';
-    return json(res, 200, { message: 'Delivery retry queued', item });
-  }
+module.exports = handler;
 
-  if (req.method === 'POST' && pathname.startsWith('/api/invoices/') && pathname.endsWith('/confirm')) {
-    if (!requireAuth(req, res)) return;
-    const id = pathname.split('/')[3];
-    const body = await readBody(req);
-    const invoice = invoices.find((entry) => entry.id === id);
-    if (!invoice) return json(res, 404, { error: 'Invoice not found' });
+/*
+|--------------------------------------------------------------------------
+| Local Dev Server (only runs locally)
+|--------------------------------------------------------------------------
+*/
 
-    invoice.status = 'Confirmed';
-    invoice.detection = body.txid ? 'Manual TXID' : invoice.detection;
-    invoice.txid = body.txid || invoice.txid || null;
-    invoice.updated = 'just now';
-
-    const queueItem = deliveryQueue.find((entry) => entry.orderId === invoice.orderId);
-    if (queueItem && queueItem.status !== 'Sent') queueItem.status = 'Queued';
-
-    return json(res, 200, { message: 'Invoice confirmed', invoice });
-  }
-
-  if (req.method === 'POST' && pathname === '/api/webhooks/ltc') {
-    const body = await readBody(req);
-    if (!body.invoiceId) return json(res, 400, { error: 'invoiceId is required' });
-
-    const invoice = invoices.find((entry) => entry.id === body.invoiceId);
-    if (!invoice) return json(res, 404, { error: 'Invoice not found' });
-
-    const confirmations = Number(body.confirmations || 0);
-    invoice.status = confirmations >= 1 ? 'Paid' : 'Pending Confirmations';
-    invoice.detection = 'Automatic';
-    invoice.txid = body.txid || invoice.txid || null;
-    invoice.updated = 'just now';
-
-    const queueItem = deliveryQueue.find((entry) => entry.orderId === invoice.orderId);
-    if (queueItem && confirmations >= 1) queueItem.status = 'Queued';
-
-    return json(res, 200, { ok: true, invoice });
-  }
-
-  if (req.method === 'GET' && pathname === '/api/invoices') {
-    if (!requireAuth(req, res)) return;
-    return json(res, 200, { items: invoices });
-  }
-
-  serveStatic(req, res, pathname);
-  return undefined;
-});
-
-server.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Temor server listening on http://localhost:${port}`);
-});
+if (require.main === module) {
+  const server = http.createServer(handler);
+  server.listen(port, () => {
+    console.log(`Temor server running on http://localhost:${port}`);
+  });
+}
