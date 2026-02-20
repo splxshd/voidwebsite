@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TemorPay Invoice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="invoice.css" />
+  </head>
+  <body>
+    <div class="bg-glow bg-glow--left"></div>
+    <div class="bg-glow bg-glow--right"></div>
+
+    <main class="invoice-wrap">
+      <a href="index.html" class="back-link">← Back to website</a>
+
+      <section class="invoice-card card">
+        <header class="invoice-head">
+          <div>
+            <p class="muted">Invoice ID</p>
+            <h1 class="invoice-id">7EFB22926146</h1>
+          </div>
+          <div class="coin-pill">Ł Litecoin</div>
+        </header>
+
+        <div class="divider"></div>
+
+        <div class="amount-block">
+          <p class="muted">Amount to Pay</p>
+          <h2 class="amount gradient-text" id="amountText">0.03294428 LTC</h2>
+          <p class="muted">≈ $1.75 USD</p>
+        </div>
+
+        <img
+          class="qr"
+          alt="Payment QR"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=litecoin:ltc1q85qy6rfmwqygh50umj4nxj4th5p4hq9fwkt4wa"
+        />
+
+        <p class="muted">Send LTC to this address:</p>
+        <div class="address-row">
+          <input id="addressField" readonly value="ltc1q85qy6rfmwqygh50umj4nxj4th5p4hq9fwkt4wa" />
+          <button class="btn btn-outline" id="copyAddress">Copy</button>
+        </div>
+
+        <div class="quick-actions">
+          <button class="btn btn-ghost" id="copyAmount">Copy Amount</button>
+          <button class="btn btn-ghost" data-mode="manual">Submit TXID</button>
+        </div>
+
+        <div class="mode-switch">
+          <button class="mode-btn is-active" data-mode="auto">Automatic Detection</button>
+          <button class="mode-btn" data-mode="manual">Manual TXID</button>
+        </div>
+
+        <section class="mode-panel is-active" id="autoPanel">
+          <article class="alert alert-warn">
+            <strong>Time remaining</strong>
+            <span id="countdown">33:15</span>
+          </article>
+          <article class="alert alert-danger">
+            Send exact amount shown above. Underpayment can fail verification.
+          </article>
+          <p class="status-pill">● Awaiting Payment (Auto Detecting On-chain)</p>
+          <button class="btn btn-primary wide" data-mode="manual">I Have Paid</button>
+        </section>
+
+        <section class="mode-panel" id="manualPanel">
+          <p class="muted">Submit your transaction hash for manual verification:</p>
+          <div class="txid-row">
+            <input id="txidField" placeholder="Paste Litecoin TXID (64 hex chars)" />
+            <button class="btn btn-outline" id="pasteTxid">Paste</button>
+          </div>
+          <article class="alert alert-info">
+            You can paste TXID from wallet history or a blockchain explorer link.
+          </article>
+          <button class="btn btn-primary wide" id="verifyTxid">Verify Payment</button>
+        </section>
+      </section>
+    </main>
+
+    <script src="invoice.js"></script>
+  </body>
+</html>

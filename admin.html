@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temor Pay Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-body">
+    <div class="admin-layout">
+      <aside class="admin-sidebar">
+        <div class="sidebar-top">
+          <div class="brand">Temor<span>Pay</span></div>
+          <p class="sidebar-subtitle">Owner Dashboard</p>
+        </div>
+
+        <nav class="menu-group">
+          <p class="menu-title">Storefront</p>
+          <button class="nav-item is-active" data-tab="products">☰ Products</button>
+          <button class="nav-item" data-tab="invoices">🧾 Invoices</button>
+          <button class="nav-item" data-tab="delivery">✉ Email Delivery</button>
+          <button class="nav-item" data-tab="reviews">⭐ Feedbacks</button>
+          <button class="nav-item" data-tab="coupons">🏷 Coupons</button>
+          <button class="nav-item" data-tab="settings">⚙ Configure</button>
+        </nav>
+
+        <nav class="menu-group muted-group">
+          <p class="menu-title">System</p>
+          <a class="side-link" href="#">Payment Methods</a>
+          <a class="side-link" href="#">Team</a>
+          <a class="side-link" href="#">Blacklist</a>
+          <a class="side-link" href="#">Domains</a>
+          <a class="side-link" href="#">Activity Logs</a>
+        </nav>
+
+        <div class="admin-actions">
+          <a class="btn btn-outline" href="index.html">Back to Website</a>
+          <button class="btn btn-ghost" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header card">
+          <div>
+            <h1>Product Dashboard</h1>
+            <p>Edit products, control email delivery, and manually confirm invoices from one place.</p>
+          </div>
+          <button class="btn btn-primary">Save Changes</button>
+        </header>
+
+        <section class="tab-panel is-active" id="products">
+          <h2>Products</h2>
+          <div class="grid two">
+            <article class="card">
+              <h3>Add Product</h3>
+              <form class="admin-form">
+                <label>Product Name <input type="text" placeholder="Lifetime Premium" /></label>
+                <label>Price (USD) <input type="number" placeholder="29.99" /></label>
+                <label>Litecoin Wallet <input type="text" placeholder="ltc1q..." /></label>
+                <label>Delivery Type
+                  <select>
+                    <option>Email Key Delivery</option>
+                    <option>Account Upgrade</option>
+                    <option>Manual Fulfillment</option>
+                  </select>
+                </label>
+                <label>Description <textarea placeholder="Describe product benefits"></textarea></label>
+                <button type="button" class="btn btn-primary">Add Product</button>
+              </form>
+            </article>
+            <article class="card">
+              <h3>Current Products</h3>
+              <table>
+                <thead>
+                  <tr><th>Name</th><th>Price</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <tr>
+                    <td data-field="name">Starter Access</td>
+                    <td data-field="price">$9.99</td>
+                    <td data-field="status">Active</td>
+                    <td>
+                      <button class="btn-mini btn-edit" type="button">Edit</button>
+                      <button class="btn-mini btn-delete" type="button">Delete</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-field="name">Pro Access</td>
+                    <td data-field="price">$29.99</td>
+                    <td data-field="status">Active</td>
+                    <td>
+                      <button class="btn-mini btn-edit" type="button">Edit</button>
+                      <button class="btn-mini btn-delete" type="button">Delete</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td data-field="name">Enterprise</td>
+                    <td data-field="price">$99.00</td>
+                    <td data-field="status">Draft</td>
+                    <td>
+                      <button class="btn-mini btn-edit" type="button">Edit</button>
+                      <button class="btn-mini btn-delete" type="button">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="invoices">
+          <h2>Invoices (Admin DB View)</h2>
+          <article class="card">
+            <table>
+              <thead>
+                <tr><th>Invoice ID</th><th>Product</th><th>Amount (LTC)</th><th>Detection</th><th>Status</th><th>Updated</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="invoiceTableBody">
+                <tr>
+                  <td>INV-1048</td><td>Pro Access</td><td>0.34</td><td>Automatic</td>
+                  <td><span class="status-badge paid">Paid</span></td><td>2 min ago</td>
+                  <td><button class="btn-mini btn-view" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td>INV-1047</td><td>Starter Access</td><td>0.11</td><td>Manual TXID</td>
+                  <td><span class="status-badge reviewing">Reviewing</span></td><td>4 min ago</td>
+                  <td>
+                    <button class="btn-mini btn-view" type="button">View</button>
+                    <button class="btn-mini btn-confirm" type="button">Confirm</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>INV-1046</td><td>Enterprise</td><td>1.22</td><td>Automatic</td>
+                  <td><span class="status-badge expired">Expired</span></td><td>10 min ago</td>
+                  <td><button class="btn-mini btn-view" type="button">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <p class="helper-note">Manual TXID invoices can be reviewed and confirmed by admin here.</p>
+        </section>
+
+        <section class="tab-panel" id="delivery">
+          <h2>Email Product Delivery</h2>
+          <div class="grid two">
+            <article class="card">
+              <h3>Email Provider Settings</h3>
+              <form class="admin-form">
+                <label>From Name <input type="text" value="TemorPay Store" /></label>
+                <label>From Email <input type="email" value="delivery@temorpay.com" /></label>
+                <label>SMTP Host <input type="text" value="smtp.mailprovider.com" /></label>
+                <label>SMTP Port <input type="number" value="587" /></label>
+                <label>Delivery Template
+                  <select>
+                    <option>License / Product Key</option>
+                    <option>Access Granted</option>
+                    <option>Custom HTML</option>
+                  </select>
+                </label>
+                <button type="button" class="btn btn-primary">Save Email Settings</button>
+              </form>
+            </article>
+            <article class="card">
+              <h3>Delivery Queue</h3>
+              <table>
+                <thead>
+                  <tr><th>Order</th><th>Email</th><th>Product</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>ORD-8812</td><td>buyer1@email.com</td><td>Pro Access</td><td><span class="status-badge paid">Sent</span></td></tr>
+                  <tr><td>ORD-8811</td><td>buyer2@email.com</td><td>Starter Access</td><td><span class="status-badge reviewing">Queued</span></td></tr>
+                  <tr><td>ORD-8810</td><td>buyer3@email.com</td><td>Enterprise</td><td><span class="status-badge expired">Failed</span></td></tr>
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-ghost" id="retryFailedEmails">Retry Failed Emails</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="reviews">
+          <h2>Reviews</h2>
+          <div class="grid two">
+            <article class="card">
+              <h3>Latest Reviews</h3>
+              <ul class="list">
+                <li><strong>5★</strong> "Checkout was super fast" — @nova</li>
+                <li><strong>4★</strong> "Good UI, add more coupon options" — @mintfox</li>
+                <li><strong>5★</strong> "Instant delivery after payment" — @orbit</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Moderation</h3>
+              <form class="admin-form">
+                <label>Review ID <input type="text" placeholder="REV-0091" /></label>
+                <label>Action
+                  <select>
+                    <option>Approve</option>
+                    <option>Hide</option>
+                    <option>Feature</option>
+                  </select>
+                </label>
+                <button type="button" class="btn btn-primary">Apply</button>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="coupons">
+          <h2>Coupons</h2>
+          <div class="grid two">
+            <article class="card">
+              <h3>Create Coupon</h3>
+              <form class="admin-form">
+                <label>Code <input type="text" placeholder="LTC20" /></label>
+                <label>Discount % <input type="number" placeholder="20" /></label>
+                <label>Expires <input type="date" /></label>
+                <button type="button" class="btn btn-primary">Create Coupon</button>
+              </form>
+            </article>
+            <article class="card">
+              <h3>Active Codes</h3>
+              <ul class="list">
+                <li><strong>WELCOME10</strong> — 10% off</li>
+                <li><strong>LTC20</strong> — 20% off</li>
+                <li><strong>VIP30</strong> — 30% off (members)</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="settings">
+          <h2>Settings</h2>
+          <article class="card">
+            <form class="admin-form">
+              <label>Store Name <input type="text" value="TemorPay" /></label>
+              <label>Store Icon URL <input type="url" placeholder="https://.../icon.png" /></label>
+              <label>Primary Color <input type="text" value="#8f5bff" /></label>
+              <label>Accent Color <input type="text" value="#3dd9ff" /></label>
+              <label>Support Email <input type="email" placeholder="owner@temorpay.com" /></label>
+              <button type="button" class="btn btn-primary">Update Branding</button>
+            </form>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,142 @@
+.invoice-wrap {
+  width: min(760px, calc(100% - 1.4rem));
+  margin: 2.2rem auto;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.invoice-card {
+  padding: 1.6rem;
+  background: linear-gradient(180deg, rgba(23, 21, 40, 0.95), rgba(14, 16, 28, 0.92));
+}
+
+.invoice-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoice-id {
+  margin: 0.15rem 0 0;
+  font-size: 2rem;
+  max-width: none;
+}
+
+.coin-pill {
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(108, 157, 255, 0.48);
+  background: rgba(66, 104, 255, 0.16);
+  font-weight: 700;
+}
+
+.divider {
+  margin: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.amount-block {
+  text-align: center;
+}
+
+.amount {
+  margin: 0.5rem 0;
+  font-size: clamp(2.1rem, 7vw, 3.5rem);
+}
+
+.qr {
+  display: block;
+  width: 220px;
+  height: 220px;
+  border-radius: 1rem;
+  margin: 1rem auto;
+  border: 8px solid white;
+}
+
+.address-row,
+.txid-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+}
+
+.quick-actions,
+.mode-switch {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 0.8rem;
+}
+
+.mode-btn {
+  padding: 0.72rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: #e7e8f6;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-btn.is-active {
+  border-color: rgba(255, 48, 176, 0.7);
+  background: rgba(255, 13, 160, 0.16);
+}
+
+.mode-panel {
+  display: none;
+  margin-top: 0.95rem;
+}
+
+.mode-panel.is-active {
+  display: block;
+}
+
+.alert {
+  border-radius: 0.8rem;
+  border: 1px solid;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+}
+
+.alert-warn {
+  border-color: rgba(255, 153, 0, 0.5);
+  background: rgba(255, 111, 0, 0.13);
+}
+
+.alert-danger {
+  border-color: rgba(255, 76, 124, 0.55);
+  background: rgba(255, 27, 83, 0.12);
+}
+
+.alert-info {
+  border-color: rgba(59, 155, 255, 0.55);
+  background: rgba(56, 110, 255, 0.13);
+}
+
+.status-pill {
+  display: inline-block;
+  margin: 0.6rem 0;
+  padding: 0.44rem 0.78rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 194, 24, 0.42);
+  background: rgba(255, 194, 24, 0.12);
+  color: #ffd767;
+  font-weight: 600;
+}
+
+.wide {
+  width: 100%;
+  margin-top: 0.7rem;
+}
+
+@media (max-width: 640px) {
+  .quick-actions,
+  .mode-switch {
+    grid-template-columns: 1fr;
+  }
+}

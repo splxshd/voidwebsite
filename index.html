@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temor Pay | Automated Litecoin Payments</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow bg-glow--left"></div>
+    <div class="bg-glow bg-glow--right"></div>
+
+    <header class="header container">
+      <div class="brand">Temor<span>Pay</span></div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#flow">How it Works</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+      <a class="btn btn-outline" href="login.html">Owner Login</a>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <p class="pill">Auto-detect payments + Manual TXID backup</p>
+        <h1>Automated <span>Litecoin</span> Payments with Neon Checkout</h1>
+        <p class="subtitle">
+          Purple-glow UI inspired by your references. Customers can pay with instant on-chain detection
+          or submit TXID manually if their wallet is delayed.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="invoice.html">Open Invoice Demo</a>
+          <a class="btn btn-ghost" href="login.html">Owner Login</a>
+        </div>
+
+        <div class="stats-grid">
+          <article>
+            <strong>&lt; 4 sec</strong>
+            <span>Invoice Generation</span>
+          </article>
+          <article>
+            <strong>Auto + TXID</strong>
+            <span>Dual Verification Paths</span>
+          </article>
+          <article>
+            <strong>0.7%</strong>
+            <span>Gateway Fee</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="features" class="section container">
+        <h2>Designed for high-converting crypto checkout</h2>
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Automatic Detection</h3>
+            <p>Realtime polling and webhook events detect incoming LTC and auto-complete paid invoices.</p>
+          </article>
+          <article class="card">
+            <h3>Manual TXID Verify</h3>
+            <p>If auto-detection is delayed, buyer submits TXID and your team/system validates transaction hash.</p>
+          </article>
+          <article class="card">
+            <h3>Owner Controls</h3>
+            <p>Products, invoices, reviews, coupons, brand settings, icon and store name configuration.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="flow" class="section container">
+        <h2>How it works</h2>
+        <div class="timeline">
+          <div><span>01</span>Customer checks out and receives a glowing payment invoice with QR + address.</div>
+          <div><span>02</span>System auto-detects payment and updates status without refreshing.</div>
+          <div><span>03</span>If needed, customer submits TXID manually for fast verification fallback.</div>
+        </div>
+      </section>
+
+      <section id="pricing" class="section container">
+        <div class="pricing card">
+          <h2>Starter Plan</h2>
+          <p class="price">0.7% <small>per successful payment</small></p>
+          <ul>
+            <li>Unlimited invoices + QR checkout</li>
+            <li>Auto detection + manual TXID flow</li>
+            <li>Webhook retries + logs</li>
+            <li>Admin panel with products/coupons/reviews/settings</li>
+          </ul>
+          <a class="btn btn-primary" href="invoice.html">Try Invoice Experience</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
